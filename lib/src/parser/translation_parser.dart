@@ -36,16 +36,19 @@ class TranslationParser {
       for (var index in iterables.range(0, document.languages.length)) {
         var itemValue;
         //incase value does not exist
-        if(index < item.values.length) {
+        if (index < item.values.length) {
           itemValue = item.values[index];
         } else {
           itemValue = '';
         }
 
-        if(itemValue == '') {
-          Log.i('WARNING: empty string in lang: '+ document.languages[index] + ', key: '+ item.key);
+        if (itemValue == '') {
+          Log.i('WARNING: empty string in lang: ' +
+              document.languages[index] +
+              ', key: ' +
+              item.key);
         }
-        
+
         final itemPlaceholders = _findPlaceholders(itemValue);
 
         final builder = builders[index];
@@ -115,7 +118,7 @@ class TranslationParser {
         throw Exception('Placeholder $placeholderName already declared');
       }
       placeholders[placeholderName] =
-          (ArbResourcePlaceholder(name: placeholderName, type: 'text'));
+          (ArbResourcePlaceholder(name: placeholderName, type: 'dynamic'));
     });
     return placeholders.values.toList();
   }

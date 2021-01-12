@@ -92,7 +92,7 @@ class ArbResource {
 }
 
 class ArbResourcePlaceholder {
-  static String typeText = 'dynamic';
+  static String typeText = 'text';
   static String typeNum = 'num';
 
   final String name;
