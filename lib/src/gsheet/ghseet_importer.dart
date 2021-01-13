@@ -7,7 +7,6 @@ import 'package:googleapis_auth/auth_io.dart';
 
 class GSheetImporter {
   final GoogleSheetConfig config;
-  
 
   GSheetImporter({this.config});
 
@@ -18,7 +17,10 @@ class GSheetImporter {
     var sheetsApi = SheetsApi(authClient);
     var spreadsheet =
         await sheetsApi.spreadsheets.get(documentId, includeGridData: true);
-    final document = await _importFrom(spreadsheet);
+    if (spreadsheet.sheets.length < config.sheetIndex) {
+      throw Exception('Sheet index is invalid');
+    }
+    final document = await _importFrom(spreadsheet.sheets[config.sheetIndex]);
     authClient.close();
 
     Log.i('Loaded document ${document.describe()}');
@@ -54,8 +56,7 @@ class GSheetImporter {
     return authClient;
   }
 
-  Future<TranslationsDocument> _importFrom(Spreadsheet spreadsheet) async {
-    final sheet = spreadsheet.sheets[0];
+  Future<TranslationsDocument> _importFrom(Sheet sheet) async {
     final rows = sheet.data[0].rowData;
     final header = rows[0];
     final headerValues = header.values;
@@ -72,7 +73,7 @@ class GSheetImporter {
         column < headerValues.length;
         column++) {
       //Stop parsing on first empty language code
-      if(headerValues[column].formattedValue == null) {
+      if (headerValues[column].formattedValue == null) {
         break;
       }
       final language = headerValues[column].formattedValue;
@@ -85,14 +86,14 @@ class GSheetImporter {
       var languages = row.values;
 
       //Skip empty rows
-      if(languages == null) {
+      if (languages == null) {
         continue;
       }
 
       var key = languages[config.sheetColumns.key].formattedValue;
 
       //Skip rows with missing key value
-      if(key == null) {
+      if (key == null) {
         continue;
       }
 

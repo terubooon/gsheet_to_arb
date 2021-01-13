@@ -48,6 +48,7 @@ GoogleSheetConfig _$GoogleSheetConfigFromJson(Map<String, dynamic> json) {
     authFile: json['auth_file'] as String,
     documentId: json['document_id'] as String,
     sheetId: json['sheet_id'] as String,
+    sheetIndex: json['sheet_index'] as int,
     categoryPrefix: json['category_prefix'] as String,
     sheetColumns: SheetColumns.generateFromJson(json['columns']),
     sheetRows: SheetRows.generateFromJson(json['rows']),
@@ -58,6 +59,7 @@ Map<String, dynamic> _$GoogleSheetConfigToJson(GoogleSheetConfig instance) =>
     <String, dynamic>{
       'document_id': instance.documentId,
       'sheet_id': instance.sheetId,
+      'sheet_index': instance.sheetIndex,
       'category_prefix': instance.categoryPrefix,
       'auth_file': instance.authFile,
       'columns': instance.sheetColumns,

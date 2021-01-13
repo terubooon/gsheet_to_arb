@@ -69,7 +69,8 @@
             auth_file: './gsheet_to_arb.yaml' # file with the gsheet authentication configuration
             category_prefix: "# " 
             document_id: 'TODO'
-            sheet_id: '0'
+            #sheet_id: '0'
+            sheet_index: 0
             columns: # This is an optional setting, if unused will fallback to default values
                 key: 0 # The column where the key for the translation is, defaults to 0
                 description: 1 # The column where the description is, defaults to 1

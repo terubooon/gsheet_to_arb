@@ -42,20 +42,21 @@ class PluginConfigManager {
       Log.i('Config already exists, please check your $configFileName');
     } else {
       final config = GsheetToArbConfig(
-          addContextPrefix: false,
-          generateCode: true,
-          outputDirectoryPath: 'lib/l10n',
-          arbFilePrefix: 'intl',
-          localizationFileName: 'l10n',
-          gsheet: GoogleSheetConfig(
-              categoryPrefix: '# ',
-              sheetId: '0',
-              documentId: '<ADD_DOCUMENT_ID_HERE>',
-              authFile: './' + authFileName,
-              sheetColumns: SheetColumns(),
-              sheetRows: SheetRows(),
-          ),
-        );
+        addContextPrefix: false,
+        generateCode: true,
+        outputDirectoryPath: 'lib/l10n',
+        arbFilePrefix: 'intl',
+        localizationFileName: 'l10n',
+        gsheet: GoogleSheetConfig(
+          categoryPrefix: '# ',
+          sheetId: '0',
+          sheetIndex: 0,
+          documentId: '<ADD_DOCUMENT_ID_HERE>',
+          authFile: './' + authFileName,
+          sheetColumns: SheetColumns(),
+          sheetRows: SheetRows(),
+        ),
+      );
 
       final root = PluginConfigRoot(config).toJson();
       final yamlString = '\n' + YamlUtils.toYamlString(root);
