@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:gsheet_to_arb/gsheet_to_arb.dart';
 
 import 'package:gsheet_to_arb/src/translation_document.dart';
@@ -6,21 +8,23 @@ import 'package:googleapis/sheets/v4.dart';
 import 'package:googleapis_auth/auth_io.dart';
 
 class GSheetImporter {
-  final GoogleSheetConfig config;
+  final GoogleSheetConfig? config;
 
   GSheetImporter({this.config});
 
   Future<TranslationsDocument> import(String documentId) async {
     Log.i('Importing ARB from Google sheet...');
-    var authClient = await _getAuthClient(config.auth);
+    var authClient =
+        await (_getAuthClient(config!.auth!) as FutureOr<AuthClient>);
     Log.startTimeTracking();
     var sheetsApi = SheetsApi(authClient);
     var spreadsheet =
         await sheetsApi.spreadsheets.get(documentId, includeGridData: true);
-    if (spreadsheet.sheets.length < config.sheetIndex) {
+    if (spreadsheet.sheets!.length < config!.sheetIndex!) {
       throw Exception('Sheet index is invalid');
     }
-    final document = await _importFrom(spreadsheet.sheets[config.sheetIndex]);
+    final document =
+        await _importFrom(spreadsheet.sheets![config!.sheetIndex!]);
     authClient.close();
 
     Log.i('Loaded document ${document.describe()}');
@@ -30,8 +34,8 @@ class GSheetImporter {
     return document;
   }
 
-  Future<AuthClient> _getAuthClient(AuthConfig auth) async {
-    final scopes = [SheetsApi.SpreadsheetsReadonlyScope];
+  Future<AuthClient?> _getAuthClient(AuthConfig auth) async {
+    final scopes = [SheetsApi.spreadsheetsReadonlyScope];
     var authClient;
     if (auth.oauthClientId != null) {
       void clientAuthPrompt(String url) {
@@ -39,33 +43,33 @@ class GSheetImporter {
             'Please go to the following URL and grant Google Spreadsheet access:\n$url\n');
       }
 
-      final client = auth.oauthClientId;
+      final client = auth.oauthClientId!;
 
       if (client.clientId == null || client.clientSecret == null) {
         throw Exception('Auth client config is invalid');
       }
 
-      var id = ClientId(client.clientId, client.clientSecret);
+      var id = ClientId(client.clientId!, client.clientSecret);
       authClient = await clientViaUserConsent(id, scopes, clientAuthPrompt);
     } else if (auth.serviceAccountKey != null) {
-      final service = auth.serviceAccountKey;
-      var credentials = ServiceAccountCredentials(service.clientEmail,
-          ClientId(service.clientId, null), service.privateKey);
+      final service = auth.serviceAccountKey!;
+      var credentials = ServiceAccountCredentials(service.clientEmail!,
+          ClientId(service.clientId!, null), service.privateKey!);
       authClient = await clientViaServiceAccount(credentials, scopes);
     }
     return authClient;
   }
 
   Future<TranslationsDocument> _importFrom(Sheet sheet) async {
-    final rows = sheet.data[0].rowData;
+    final rows = sheet.data![0].rowData!;
     final header = rows[0];
-    final headerValues = header.values;
+    final headerValues = header.values!;
 
-    final languages = <String>[];
+    final languages = <String?>[];
     final items = <TranslationRow>[];
 
-    var firstLanguageColumn = config.sheetColumns.first_language_key;
-    var firstTranslationsRow = config.sheetRows.first_translation_row;
+    var firstLanguageColumn = config!.sheetColumns!.first_language_key;
+    var firstTranslationsRow = config!.sheetRows!.first_translation_row;
 
     var currentCategory = '';
 
@@ -90,23 +94,23 @@ class GSheetImporter {
         continue;
       }
 
-      var key = languages[config.sheetColumns.key].formattedValue;
+      var key = languages[config!.sheetColumns!.key].formattedValue;
 
       //Skip rows with missing key value
       if (key == null) {
         continue;
       }
 
-      if (key.startsWith(config.categoryPrefix)) {
-        currentCategory = key.substring(config.categoryPrefix.length);
+      if (key.startsWith(config!.categoryPrefix!)) {
+        currentCategory = key.substring(config!.categoryPrefix!.length);
         continue;
       }
 
       final description =
-          languages[config.sheetColumns.description].formattedValue ?? '';
+          languages[config!.sheetColumns!.description].formattedValue ?? '';
 
-      final values = row.values
-          .sublist(firstLanguageColumn, row.values.length)
+      final values = row.values!
+          .sublist(firstLanguageColumn, row.values!.length)
           .map((data) => data.formattedValue ?? '')
           .toList();
 

@@ -5,19 +5,19 @@
  */
 
 class ArbDocument {
-  String locale;
-  DateTime lastModified;
-  List<ArbResource> entries;
+  String? locale;
+  DateTime? lastModified;
+  List<ArbResource>? entries;
 
   ArbDocument(this.locale, this.lastModified, this.entries);
 
-  Map<String, Object> toJson({bool compact = false}) {
-    final json = <String, Object>{};
+  Map<String?, Object?> toJson({bool compact = false}) {
+    final json = <String?, Object?>{};
 
     json['@@locale'] = locale;
-    json['@@last_modified'] = lastModified.toIso8601String();
+    json['@@last_modified'] = lastModified!.toIso8601String();
 
-    entries.forEach((ArbResource resource) {
+    entries!.forEach((ArbResource resource) {
       json[resource.key] = resource.value;
       if (resource.attributes.isNotEmpty && !compact) {
         json['@${resource.key}'] = resource.attributes;
@@ -37,11 +37,11 @@ class ArbDocument {
       } else if ('@@last_modified' == key) {
         lastModified = DateTime.parse(value);
       } else if (key.startsWith('@')) {
-        var entry = entriesMap[key.substring(2)];
+        var entry = entriesMap[key.substring(2)]!;
         entry.attributes.addAll(value);
       } else {
         var entry = ArbResource(key, value);
-        entries.add(entry);
+        entries!.add(entry);
         entriesMap[key] = entry;
       }
     });
@@ -49,14 +49,14 @@ class ArbDocument {
 }
 
 class ArbResource {
-  final String key;
+  final String? key;
   final String value;
-  final Map<String, Object> attributes = {};
+  final Map<String, Object?> attributes = {};
   final List<ArbResourcePlaceholder> placeholders;
-  final String description;
-  final String context;
+  final String? description;
+  final String? context;
 
-  ArbResource(String key, String value,
+  ArbResource(String? key, String value,
       {this.description = '', this.context = '', this.placeholders = const []})
       : key = key,
         value = value {
@@ -67,21 +67,21 @@ class ArbResource {
       attributes['placeholders'] = _formatPlaceholders(placeholders);
     }
 
-    if (description != null && description.isNotEmpty) {
+    if (description != null && description!.isNotEmpty) {
       attributes['description'] = description;
     }
 
-    if (context != null && context.isNotEmpty) {
+    if (context != null && context!.isNotEmpty) {
       attributes['context'] = context;
     }
   }
 
-  Map<String, Object> _formatPlaceholders(
+  Map<String?, Object> _formatPlaceholders(
       List<ArbResourcePlaceholder> placeholders) {
-    final map = <String, Object>{};
+    final map = <String?, Object>{};
 
     placeholders.forEach((placeholder) {
-      final placeholderArgs = <String, Object>{};
+      final placeholderArgs = <String, Object?>{};
       if (placeholder.type != null) {
         placeholderArgs['type'] = placeholder.type;
       }
@@ -95,10 +95,10 @@ class ArbResourcePlaceholder {
   static String typeText = 'text';
   static String typeNum = 'num';
 
-  final String name;
-  final String type;
-  final String description;
-  final String example;
+  final String? name;
+  final String? type;
+  final String? description;
+  final String? example;
 
   ArbResourcePlaceholder({
     this.name,
@@ -115,8 +115,8 @@ class ArbBundle {
 }
 
 class ArbDocumentBuilder {
-  String locale;
-  DateTime lastModified;
+  String? locale;
+  DateTime? lastModified;
   List<ArbResource> entries = [];
 
   ArbDocumentBuilder(this.locale, this.lastModified);

@@ -9,13 +9,13 @@ class YamlUtils {
     return yaml;
   }
 
-  static Map<String, dynamic> load(String filePath) {
+  static Map<String, dynamic>? load(String filePath) {
     var yaml = _loadYamlFile(filePath);
     var map = jsonDecode(jsonEncode(yaml));
     return map;
   }
 
-  static YamlMap _loadYamlFile(String path) {
+  static YamlMap? _loadYamlFile(String path) {
     final yamlFile = File(path);
     final yamlContent = yamlFile.readAsStringSync();
     final yaml = loadYaml(yamlContent);
@@ -62,7 +62,7 @@ void _mapToYamlString(Map node, int indent, StringSink ss, bool isTopLevel) {
     indent += 2;
   }
 
-  final keys = _sortKeys(node);
+  final keys = _sortKeys(node as Map<String, dynamic>);
 
   keys.forEach((k) {
     final v = node[k];

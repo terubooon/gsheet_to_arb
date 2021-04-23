@@ -14,7 +14,7 @@ part 'plugin_config.g.dart';
 @JsonSerializable()
 class PluginConfigRoot {
   @JsonKey(name: 'gsheet_to_arb')
-  GsheetToArbConfig content;
+  GsheetToArbConfig? content;
 
   PluginConfigRoot(this.content);
 
@@ -30,22 +30,22 @@ class PluginConfigRoot {
 @JsonSerializable()
 class GsheetToArbConfig {
   @JsonKey(name: 'output_directory')
-  String outputDirectoryPath;
+  String? outputDirectoryPath;
 
   @JsonKey(name: 'arb_file_prefix')
-  String arbFilePrefix;
+  String? arbFilePrefix;
 
   @JsonKey(name: 'localization_file_name')
-  String localizationFileName;
+  String? localizationFileName;
 
   @JsonKey(name: 'generate_code')
-  bool generateCode;
+  bool? generateCode;
 
   @JsonKey(name: 'add_context_prefix')
-  bool addContextPrefix;
+  bool? addContextPrefix;
 
   @JsonKey(name: 'gsheet')
-  GoogleSheetConfig gsheet;
+  GoogleSheetConfig? gsheet;
 
   GsheetToArbConfig(
       {this.outputDirectoryPath,
@@ -67,28 +67,28 @@ class GsheetToArbConfig {
 @JsonSerializable()
 class GoogleSheetConfig {
   @JsonKey(name: 'document_id')
-  String documentId;
+  String? documentId;
 
   @JsonKey(name: 'sheet_id')
-  String sheetId;
+  String? sheetId;
 
   @JsonKey(name: 'sheet_index')
-  int sheetIndex;
+  int? sheetIndex;
 
   @JsonKey(name: 'category_prefix')
-  String categoryPrefix;
+  String? categoryPrefix;
 
   @JsonKey(name: 'auth_file')
-  String authFile;
+  String? authFile;
 
   @JsonKey(name: 'columns', fromJson: SheetColumns.generateFromJson)
-  SheetColumns sheetColumns;
+  SheetColumns? sheetColumns;
 
   @JsonKey(name: 'rows', fromJson: SheetRows.generateFromJson)
-  SheetRows sheetRows;
+  SheetRows? sheetRows;
 
   @JsonKey(ignore: true)
-  AuthConfig auth;
+  AuthConfig? auth;
 
   GoogleSheetConfig(
       {this.authFile,
@@ -183,10 +183,10 @@ class SheetRows {
 @JsonSerializable()
 class AuthConfig {
   @JsonKey(name: 'oauth_client_id')
-  OAuthClientId oauthClientId;
+  OAuthClientId? oauthClientId;
 
   @JsonKey(name: 'service_account_key')
-  ServiceAccountKey serviceAccountKey;
+  ServiceAccountKey? serviceAccountKey;
 
   AuthConfig({this.oauthClientId, this.serviceAccountKey});
 
@@ -202,10 +202,10 @@ class AuthConfig {
 @JsonSerializable()
 class OAuthClientId {
   @JsonKey(name: 'client_id')
-  String clientId;
+  String? clientId;
 
   @JsonKey(name: 'client_secret')
-  String clientSecret;
+  String? clientSecret;
 
   OAuthClientId({this.clientId, this.clientSecret});
 
@@ -221,13 +221,13 @@ class OAuthClientId {
 @JsonSerializable()
 class ServiceAccountKey {
   @JsonKey(name: 'client_id', nullable: false)
-  String clientId;
+  String? clientId;
 
   @JsonKey(name: 'client_email', nullable: false)
-  String clientEmail;
+  String? clientEmail;
 
   @JsonKey(name: 'private_key', nullable: false)
-  String privateKey;
+  String? privateKey;
 
   ServiceAccountKey({
     this.clientId,

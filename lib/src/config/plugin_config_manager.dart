@@ -15,17 +15,17 @@ final configFileName = 'pubspec.yaml';
 final _gitignore = '.gitignore';
 
 class PluginConfigManager {
-  Future<GsheetToArbConfig> getConfig() async {
-    final pubspec = YamlUtils.load(configFileName);
+  Future<GsheetToArbConfig?> getConfig() async {
+    final pubspec = YamlUtils.load(configFileName)!;
     final config = PluginConfigRoot.fromJson(pubspec).content;
 
     if (config?.gsheet?.authFile != null) {
-      if (!FileUtils.exists(config.gsheet.authFile)) {
+      if (!FileUtils.exists(config!.gsheet!.authFile!)) {
         return null;
       }
 
-      final authConfig = YamlUtils.load(config.gsheet.authFile);
-      config.gsheet.auth = AuthConfig.fromJson(authConfig);
+      final authConfig = YamlUtils.load(config.gsheet!.authFile!)!;
+      config.gsheet!.auth = AuthConfig.fromJson(authConfig);
     }
 
     if (config != null) {
@@ -37,7 +37,7 @@ class PluginConfigManager {
   }
 
   void createConfig() {
-    final pubspec = YamlUtils.load(configFileName);
+    final pubspec = YamlUtils.load(configFileName)!;
     if (PluginConfigRoot.fromJson(pubspec).content != null) {
       Log.i('Config already exists, please check your $configFileName');
     } else {

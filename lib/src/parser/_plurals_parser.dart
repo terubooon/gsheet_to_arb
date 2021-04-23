@@ -20,7 +20,7 @@ class Completed extends PluralsStatus {
 }
 
 class PluralsParser {
-  final bool addContextPrefix;
+  final bool? addContextPrefix;
 
   final _pluralSeparator = '=';
 
@@ -33,15 +33,15 @@ class PluralsParser {
     'other': PluralCase.other
   };
 
-  String _key;
-  ArbResource _resource;
-  final _placeholders = <String, ArbResourcePlaceholder>{};
+  String? _key;
+  ArbResource? _resource;
+  final _placeholders = <String?, ArbResourcePlaceholder>{};
   final _values = <PluralCase, String>{};
 
   PluralsParser(this.addContextPrefix);
 
   PluralsStatus consume(ArbResource resource) {
-    final pluralCase = _getCase(resource.key);
+    final pluralCase = _getCase(resource.key!);
 
     // normal item
     if (pluralCase == null) {
@@ -61,7 +61,7 @@ class PluralsParser {
     }
 
     // plural item
-    final caseKey = _getCaseKey(resource.key);
+    final caseKey = _getCaseKey(resource.key!);
 
     if (_key == caseKey) {
       // same plural - another entry
@@ -105,7 +105,7 @@ class PluralsParser {
     return Skip();
   }
 
-  PluralCase _getCase(String key) {
+  PluralCase? _getCase(String key) {
     if (key.contains(_pluralSeparator)) {
       for (var plural in _pluralKeywords.keys) {
         if (key.endsWith('$_pluralSeparator$plural')) {
@@ -121,15 +121,15 @@ class PluralsParser {
   }
 
   Completed _getCompleted({bool consumed = false}) {
-    final formattedKey = addContextPrefix && _resource.context.isNotEmpty
-        ? ReCase(_resource.context + '_' + _key).camelCase
-        : ReCase(_key).camelCase;
+    final formattedKey = addContextPrefix! && _resource!.context!.isNotEmpty
+        ? ReCase(_resource!.context! + '_' + _key!).camelCase
+        : ReCase(_key!).camelCase;
 
     return Completed(
         ArbResource(formattedKey, PluralsFormatter.format(Map.from(_values)),
             placeholders: List.from(_placeholders.values),
-            context: _resource.context,
-            description: _resource.description),
+            context: _resource!.context,
+            description: _resource!.description),
         consumed: consumed);
   }
 

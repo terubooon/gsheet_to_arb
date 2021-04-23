@@ -7,7 +7,7 @@ import 'dart/arb_to_dart_generator.dart';
 import 'gsheet/ghseet_importer.dart';
 
 class GSheetToArb {
-  final GsheetToArbConfig config;
+  final GsheetToArbConfig? config;
 
   final _arbSerializer = ArbSerializer();
 
@@ -17,8 +17,8 @@ class GSheetToArb {
     Log.i('Building translation...');
     Log.startTimeTracking();
 
-    final gsheet = config.gsheet;
-    final documentId = gsheet.documentId;
+    final gsheet = config!.gsheet!;
+    final documentId = gsheet.documentId!;
 
     // import TranslationsDocument
     final importer = GSheetImporter(config: gsheet);
@@ -26,17 +26,17 @@ class GSheetToArb {
 
     // Parse TranslationsDocument to ArbBundle
     final sheetParser =
-        TranslationParser(addContextPrefix: config.addContextPrefix);
+        TranslationParser(addContextPrefix: config!.addContextPrefix);
     final arbBundle = await sheetParser.parseDocument(document);
 
     // Save ArbBundle
-    _arbSerializer.saveArbBundle(arbBundle, config.outputDirectoryPath);
+    _arbSerializer.saveArbBundle(arbBundle, config!.outputDirectoryPath!);
 
     // Generate Code from ArbBundle
-    if (config.generateCode) {
+    if (config!.generateCode!) {
       final generator = ArbToDartGenerator();
       generator.generateDartClasses(
-          arbBundle, config.outputDirectoryPath, config.localizationFileName);
+          arbBundle, config!.outputDirectoryPath!, config!.localizationFileName!);
     }
 
     Log.i('Succeeded after ${Log.stopTimeTracking()}');

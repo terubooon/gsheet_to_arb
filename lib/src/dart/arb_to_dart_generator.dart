@@ -23,7 +23,7 @@ class ArbToDartGenerator {
 
   void generateDartClasses(
       ArbBundle bundle, String outputDirectoryPath, String className,
-      {bool addContextPrefix}) {
+      {bool? addContextPrefix}) {
     Log.i('Genrating Dart classes from ARB...');
     Log.startTimeTracking();
     _buildIntlListFile(bundle.documents.first, outputDirectoryPath, className);
@@ -39,7 +39,7 @@ class ArbToDartGenerator {
       builder.name = ReCase(className).pascalCase;
       builder.docs.add(
           '\n//ignore_for_file: type_annotate_public_apis, non_constant_identifier_names');
-      document.entries.forEach((ArbResource entry) {
+      document.entries!.forEach((ArbResource entry) {
         var method = _getResourceMethod(entry);
         builder.methods.add(method);
       });
@@ -50,7 +50,7 @@ class ArbToDartGenerator {
       builder.body.add(translationClass);
     });
 
-    final emitter = DartEmitter(Allocator.simplePrefixing());
+    final emitter = DartEmitter(allocator: Allocator.simplePrefixing());
     final emitted = library.accept(emitter);
     final formatted = DartFormatter().format('${emitted}');
 
@@ -63,7 +63,7 @@ class ArbToDartGenerator {
     return Method((MethodBuilder builder) {
       final key = resource.key;
       final docs =
-          _fixSpecialCharacters(resource.attributes['description'] ??= '')
+          _fixSpecialCharacters((resource.attributes['description'] ??= '') as String)
               .replaceAll('\\n', '\n/// ');
 
       final methodName = key;
@@ -85,11 +85,11 @@ class ArbToDartGenerator {
 
   void _getResourceFullMethod(ArbResource resource, MethodBuilder builder) {
     final key = resource.key;
-    final value = _escapeString(resource.value);
+    final value = _escapeString(resource.value)!;
     final description =
-        _escapeString(resource.attributes['description'] ??= '');
+        _escapeString((resource.attributes['description'] ??= '') as String?);
 
-    var args = <String>[];
+    var args = <String?>[];
     resource.placeholders.forEach((ArbResourcePlaceholder placeholder) {
       builder.requiredParameters.add(Parameter((ParameterBuilder builder) {
         args.add(placeholder.name);
@@ -97,7 +97,7 @@ class ArbToDartGenerator {
             ? 'int'
             : 'String';
         builder
-          ..name = placeholder.name
+          ..name = placeholder.name!
           ..type = Reference(argumentType);
       }));
     });
@@ -111,7 +111,7 @@ class ArbToDartGenerator {
     final key = resource.key;
     final value = _escapeString(resource.value);
     final description =
-        _escapeString(resource.attributes['description'] ??= key);
+        _escapeString((resource.attributes['description'] ??= key) as String?);
 
     builder
       ..type = MethodType.getter
@@ -125,7 +125,7 @@ class ArbToDartGenerator {
   final Parser<dynamic> _pluralParser = CustomIcuParser().message;
   final Parser<dynamic> _plainParser = CustomIcuParser().nonIcuMessage;
 
-  String _getCode(String value, {String key, String description, List args}) {
+  String _getCode(String value, {String? key, String? description, List? args}) {
     Message message = _pluralParser.parse(value).value;
     if (message is LiteralString && message.string.isEmpty) {
       message = _plainParser.parse(value).value;
@@ -133,7 +133,7 @@ class ArbToDartGenerator {
     if (message is Plural) {
       final pluralBuilder = StringBuffer();
       pluralBuilder.write('Intl.plural(count,');
-      void addIfNotNull(String key, Message message) {
+      void addIfNotNull(String key, Message? message) {
         if (message != null) {
           final val = _getMessageCode(message);
           pluralBuilder.write('$key:\'$val\',');
@@ -151,7 +151,7 @@ class ArbToDartGenerator {
         'name: \'${key}\',',
       );
       pluralBuilder.write(
-        'args: [${args.join(", ")}],',
+        'args: [${args!.join(", ")}],',
       );
       pluralBuilder.write(
         'desc: \'${description}\'',
@@ -163,7 +163,7 @@ class ArbToDartGenerator {
       return code;
     }
     final code = _getMessageCode(message);
-    return """Intl.message('${code}', name: '$key', args: [${args.join(", ")}], desc: '${description}')""";
+    return """Intl.message('${code}', name: '$key', args: [${args!.join(", ")}], desc: '${description}')""";
   }
 
   String _getMessageCode(Message message) {
@@ -188,7 +188,7 @@ class ArbToDartGenerator {
 
   String _getComositeMessageCode(CompositeMessage composite) {
     final builder = StringBuffer();
-    for (var message in composite.pieces) {
+    for (var message in composite.pieces!) {
       builder.write(_getMessageCode(message));
     }
     return builder.toString();
@@ -208,7 +208,7 @@ const int _UNICODE_END = 0x10ffff;
 const int _C0_START = 0x00;
 const int _C0_END = 0x1f;
 
-String _escapeString(String string) {
+String? _escapeString(String? string) {
   if (string == null) {
     return null;
   }

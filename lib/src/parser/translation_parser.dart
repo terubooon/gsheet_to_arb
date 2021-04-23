@@ -15,7 +15,7 @@ import 'package:recase/recase.dart';
 import '_plurals_parser.dart';
 
 class TranslationParser {
-  final bool addContextPrefix;
+  final bool? addContextPrefix;
 
   TranslationParser({this.addContextPrefix});
 
@@ -23,7 +23,7 @@ class TranslationParser {
     final builders = <ArbDocumentBuilder>[];
     final parsers = <PluralsParser>[];
 
-    for (var langauge in document.languages) {
+    for (var langauge in document.languages!) {
       final builder = ArbDocumentBuilder(langauge, document.lastModified);
       final parser = PluralsParser(addContextPrefix);
       builders.add(builder);
@@ -31,27 +31,27 @@ class TranslationParser {
     }
 
     // for each row
-    for (var item in document.items) {
+    for (var item in document.items!) {
       // for each language
-      for (var index in iterables.range(0, document.languages.length)) {
+      for (var index in iterables.range(0, document.languages!.length)) {
         var itemValue;
         //incase value does not exist
-        if (index < item.values.length) {
-          itemValue = item.values[index];
+        if (index < item.values!.length) {
+          itemValue = item.values![index as int];
         } else {
           itemValue = '';
         }
 
         if (itemValue == '') {
           Log.i('WARNING: empty string in lang: ' +
-              document.languages[index] +
+              document.languages![index as int]! +
               ', key: ' +
-              item.key);
+              item.key!);
         }
 
         final itemPlaceholders = _findPlaceholders(itemValue);
 
-        final builder = builders[index];
+        final builder = builders[index as int];
         final parser = parsers[index];
 
         // plural consume
@@ -73,9 +73,9 @@ class TranslationParser {
           }
         }
 
-        final key = addContextPrefix && item.category.isNotEmpty
-            ? ReCase(item.category + '_' + item.key).camelCase
-            : ReCase(item.key).camelCase;
+        final key = addContextPrefix! && item.category!.isNotEmpty
+            ? ReCase(item.category! + '_' + item.key!).camelCase
+            : ReCase(item.key!).camelCase;
 
         // add resource
         builder.add(ArbResource(key, itemValue,
@@ -86,8 +86,8 @@ class TranslationParser {
     }
 
     // finalizer
-    for (var index in iterables.range(0, document.languages.length - 1)) {
-      final builder = builders[index];
+    for (var index in iterables.range(0, document.languages!.length - 1)) {
+      final builder = builders[index as int];
       final parser = parsers[index];
       final status = parser.complete();
       if (status is Completed) {
@@ -111,7 +111,7 @@ class TranslationParser {
     var matches = _placeholderRegex.allMatches(text);
     var placeholders = <String, ArbResourcePlaceholder>{};
     matches.forEach((Match match) {
-      var group = match.group(0);
+      var group = match.group(0)!;
       var placeholderName = group.substring(1, group.length - 1);
 
       if (placeholders.containsKey(placeholderName)) {
