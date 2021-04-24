@@ -14,8 +14,7 @@ class GSheetImporter {
 
   Future<TranslationsDocument> import(String documentId) async {
     Log.i('Importing ARB from Google sheet...');
-    var authClient =
-        await (_getAuthClient(config!.auth!) as FutureOr<AuthClient>);
+    var authClient = await _getAuthClient(config!.auth!);
     Log.startTimeTracking();
     var sheetsApi = SheetsApi(authClient);
     var spreadsheet =
@@ -34,7 +33,7 @@ class GSheetImporter {
     return document;
   }
 
-  Future<AuthClient?> _getAuthClient(AuthConfig auth) async {
+  Future<AuthClient> _getAuthClient(AuthConfig auth) async {
     final scopes = [SheetsApi.spreadsheetsReadonlyScope];
     var authClient;
     if (auth.oauthClientId != null) {
