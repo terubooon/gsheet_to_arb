@@ -6,7 +6,6 @@
 
 library gsheet_to_arb;
 
-import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -45,8 +44,7 @@ void main(List<String> args) async {
     exit(0);
   }
 
-  final config =
-      await (configManager.getConfig() as FutureOr<GsheetToArbConfig>);
+  final config = await configManager.getConfig();
   if (config == null) {
     Log.i(
         'Config not found - please create config first with the --create-config flag');
