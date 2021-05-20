@@ -10,35 +10,31 @@ import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:gsheet_to_arb/src/arb/arb.dart';
 import 'package:gsheet_to_arb/src/utils/log.dart';
-import 'package:recase/recase.dart';
-import '_icu_parser.dart';
-import '_intl_translation_generator.dart';
 import 'package:intl_translation/src/intl_message.dart';
 import 'package:petitparser/petitparser.dart';
+import 'package:recase/recase.dart';
+
+import '_icu_parser.dart';
+import '_intl_translation_generator.dart';
 
 class ArbToDartGenerator {
   final intlTranslation = IntlTranslationGenerator();
 
   ArbToDartGenerator();
 
-  void generateDartClasses(
-      ArbBundle bundle, String outputDirectoryPath, String className,
-      {bool? addContextPrefix}) {
+  void generateDartClasses(ArbBundle bundle, String outputDirectoryPath, String className, {bool? addContextPrefix}) {
     Log.i('Genrating Dart classes from ARB...');
     Log.startTimeTracking();
     _buildIntlListFile(bundle.documents.first, outputDirectoryPath, className);
 
     intlTranslation.generateLookupTables(outputDirectoryPath, className);
-    Log.i(
-        'Genrating Dart classes from ARB completed, took ${Log.stopTimeTracking()}');
+    Log.i('Genrating Dart classes from ARB completed, took ${Log.stopTimeTracking()}');
   }
 
-  void _buildIntlListFile(
-      ArbDocument document, String directory, String className) {
+  void _buildIntlListFile(ArbDocument document, String directory, String className) {
     var translationClass = Class((ClassBuilder builder) {
       builder.name = ReCase(className).pascalCase;
-      builder.docs.add(
-          '\n//ignore_for_file: type_annotate_public_apis, non_constant_identifier_names');
+      builder.docs.add('\n//ignore_for_file: type_annotate_public_apis, non_constant_identifier_names');
       document.entries!.forEach((ArbResource entry) {
         var method = _getResourceMethod(entry);
         builder.methods.add(method);
@@ -50,7 +46,7 @@ class ArbToDartGenerator {
       builder.body.add(translationClass);
     });
 
-    final emitter = DartEmitter(allocator: Allocator.simplePrefixing());
+    final emitter = DartEmitter(Allocator.simplePrefixing());
     final emitted = library.accept(emitter);
     final formatted = DartFormatter().format('${emitted}');
 
@@ -62,9 +58,7 @@ class ArbToDartGenerator {
   Method _getResourceMethod(ArbResource resource) {
     return Method((MethodBuilder builder) {
       final key = resource.key;
-      final docs =
-          _fixSpecialCharacters((resource.attributes['description'] ??= '') as String)
-              .replaceAll('\\n', '\n/// ');
+      final docs = _fixSpecialCharacters((resource.attributes['description'] ??= '') as String).replaceAll('\\n', '\n/// ');
 
       final methodName = key;
       // (addContextPrefix ? '${resource.context.toLowerCase()}_' : '') + ReCase(key).camelCase;
@@ -86,37 +80,30 @@ class ArbToDartGenerator {
   void _getResourceFullMethod(ArbResource resource, MethodBuilder builder) {
     final key = resource.key;
     final value = _escapeString(resource.value)!;
-    final description =
-        _escapeString((resource.attributes['description'] ??= '') as String?);
+    final description = _escapeString((resource.attributes['description'] ??= '') as String?);
 
     var args = <String?>[];
     resource.placeholders.forEach((ArbResourcePlaceholder placeholder) {
       builder.requiredParameters.add(Parameter((ParameterBuilder builder) {
         args.add(placeholder.name);
-        final argumentType = placeholder.type == ArbResourcePlaceholder.typeNum
-            ? 'int'
-            : 'String';
+        final argumentType = placeholder.type == ArbResourcePlaceholder.typeNum ? 'int' : 'String';
         builder
           ..name = placeholder.name!
           ..type = Reference(argumentType);
       }));
     });
 
-    builder
-      ..body =
-          Code(_getCode(value, key: key, args: args, description: description));
+    builder..body = Code(_getCode(value, key: key, args: args, description: description));
   }
 
   void _getResourceGetter(ArbResource resource, MethodBuilder builder) {
     final key = resource.key;
     final value = _escapeString(resource.value);
-    final description =
-        _escapeString((resource.attributes['description'] ??= key) as String?);
+    final description = _escapeString((resource.attributes['description'] ??= key) as String?);
 
     builder
       ..type = MethodType.getter
-      ..body = Code(
-          '''Intl.message('${value}', name: '${key}', desc: '${description}')''');
+      ..body = Code('''Intl.message('${value}', name: '${key}', desc: '${description}')''');
   }
 
   ///

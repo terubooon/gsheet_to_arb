@@ -22,6 +22,4 @@ void main() async {
   print(l10n.numberOfSongsAvailable(2));
   print(l10n.numberOfSongsAvailable(5));
   print(l10n.numberOfSongsAvailable(10));
-
-  
 }
