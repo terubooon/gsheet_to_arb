@@ -9,8 +9,9 @@ library gsheet_to_arb;
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:gsheet_to_arb/gsheet_to_arb.dart';
+import 'package:gsheet_to_arb/src/config/plugin_config.dart';
 import 'package:gsheet_to_arb/src/config/plugin_config_manager.dart';
+import 'package:gsheet_to_arb/src/gsheet_to_arb.dart';
 import 'package:gsheet_to_arb/src/utils/log.dart';
 
 void main(List<String> args) async {
@@ -19,14 +20,8 @@ void main(List<String> args) async {
   late bool showHelp;
   late bool createConfig;
 
-  parser.addFlag('help',
-      negatable: false,
-      callback: (value) => showHelp = value,
-      help: 'show help');
-  parser.addFlag('create-config',
-      negatable: false,
-      callback: (value) => createConfig = value,
-      help: 'generate configuration files');
+  parser.addFlag('help', negatable: false, callback: (value) => showHelp = value, help: 'show help');
+  parser.addFlag('create-config', negatable: false, callback: (value) => createConfig = value, help: 'generate configuration files');
 
   parser.parse(args);
 
@@ -46,8 +41,7 @@ void main(List<String> args) async {
 
   final config = await configManager.getConfig();
   if (config == null) {
-    Log.i(
-        'Config not found - please create config first with the --create-config flag');
+    Log.i('Config not found - please create config first with the --create-config flag');
     exit(1);
   }
 
@@ -61,22 +55,19 @@ void _checkAuthConfig(GoogleSheetConfig config) {
   final placeholder = 'TODO';
 
   if (config.auth == null) {
-    Log.i(
-        'Authetnication config not found - please add config to ${config.authFile} file');
+    Log.i('Authetnication config not found - please add config to ${config.authFile} file');
     exit(1);
   }
 
   final auth = config.auth!;
 
   if (auth.oauthClientId == null && auth.serviceAccountKey == null) {
-    Log.i(
-        'Authetnication config is invalid - please add config to ${config.authFile} file');
+    Log.i('Authetnication config is invalid - please add config to ${config.authFile} file');
     exit(1);
   }
 
   if (auth.oauthClientId != null) {
-    if (auth.oauthClientId!.clientId == placeholder ||
-        auth.oauthClientId!.clientSecret == placeholder) {
+    if (auth.oauthClientId!.clientId == placeholder || auth.oauthClientId!.clientSecret == placeholder) {
       Log.i('Please use valid auth client configuration');
       exit(1);
     }

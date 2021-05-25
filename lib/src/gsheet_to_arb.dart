@@ -3,7 +3,6 @@ import 'package:gsheet_to_arb/src/utils/log.dart';
 
 import 'arb/arb_serializer.dart';
 import 'config/plugin_config.dart';
-import 'dart/arb_to_dart_generator.dart';
 import 'gsheet/ghseet_importer.dart';
 
 class GSheetToArb {
@@ -25,19 +24,11 @@ class GSheetToArb {
     final document = await importer.import(documentId);
 
     // Parse TranslationsDocument to ArbBundle
-    final sheetParser =
-        TranslationParser(addContextPrefix: config!.addContextPrefix);
+    final sheetParser = TranslationParser(addContextPrefix: config!.addContextPrefix);
     final arbBundle = await sheetParser.parseDocument(document);
 
     // Save ArbBundle
     _arbSerializer.saveArbBundle(arbBundle, config!.outputDirectoryPath!);
-
-    // Generate Code from ArbBundle
-    if (config!.generateCode!) {
-      final generator = ArbToDartGenerator();
-      generator.generateDartClasses(
-          arbBundle, config!.outputDirectoryPath!, config!.localizationFileName!);
-    }
 
     Log.i('Succeeded after ${Log.stopTimeTracking()}');
   }
